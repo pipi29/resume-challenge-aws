@@ -102,23 +102,47 @@ navItems.forEach(item => {
             document.body.classList.remove('is-preload');
         });
 
-// Email copying 
+
+//copyemail
 function copyEmail() {
     const email = "diawpijun@gmail.com";
+    const icon = document.getElementById('email-icon');
     
-    navigator.clipboard.writeText(email).then(() => {
-        const icon = document.getElementById('email-icon');
-        const originalTitle = icon.title;
-        
-        icon.title = "copied";
-        alert("copied✨"); 
-        
-        setTimeout(() => { icon.title = originalTitle; }, 2000);
-    });
+    // Fallback: Use older method if clipboard API is blocked by non-HTTPS
+    if (!navigator.clipboard) {
+        const textArea = document.createElement("textarea");
+        textArea.value = email;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            handleCopyFeedback(icon);
+        } catch (err) {
+            console.error('Fallback failed', err);
+        }
+        document.body.removeChild(textArea);
+        return;
+    }
+
+    // Modern API
+    navigator.clipboard.writeText(email)
+        .then(() => handleCopyFeedback(icon))
+        .catch(err => console.error('Copy failed', err));
 }
 
-
-
-
-
-
+function handleCopyFeedback(icon) {
+    const originalTitle = icon.title;
+    icon.title = "Copied!";
+    
+    // Better UX: Show a small text or change icon color temporarily
+    const feedback = document.createElement('span');
+    feedback.innerText = " ✨ Copied!";
+    feedback.style.fontSize = "0.8rem";
+    feedback.style.color = "#28a745";
+    icon.parentNode.appendChild(feedback);
+    
+    setTimeout(() => { 
+        icon.title = originalTitle; 
+        feedback.remove();
+    }, 2000);
+}
