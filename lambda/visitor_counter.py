@@ -3,7 +3,8 @@ import boto3
 import os
 from decimal import Decimal
 
-table_name = os.environ.get('DYNAMODB_TABLE', 'resume-test') 
+table_name = os.environ.get('DYNAMODB_TABLE', 'resume-visitor-counter')
+counter_partition_key = os.environ.get('COUNTER_PK', 'visitor_count')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(table_name)
 
@@ -17,7 +18,7 @@ def lambda_handler(event, context):
     try:
 
         response = table.update_item(
-            Key={'id': 'visitor_count'},
+            Key={'id': counter_partition_key},
             UpdateExpression='ADD #v :inc',
             ExpressionAttributeNames={'#v': 'count'},
             ExpressionAttributeValues={':inc': 1},

@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Cloud resume visitor counter API with DynamoDB persistence.
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    MemorySize: 128
+    Tracing: Active
+
+Resources:
+  VisitorCounterTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: resume-visitor-counter
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  VisitorCounterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: resume-visitor-counter
+      CodeUri: lambda/
+      Handler: visitor_counter.lambda_handler
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref VisitorCounterTable
+          COUNTER_PK: visitor_count
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Sid: DynamoCounterWrite
+              Effect: Allow
+              Action:
+                - dynamodb:UpdateItem
+              Resource: !GetAtt VisitorCounterTable.Arn
+      Events:
+        GetCounter:
+          Type: Api
+          Properties:
+            Path: /counter
+            Method: get
+        CounterOptions:
+          Type: Api
+          Properties:
+            Path: /counter
+            Method: options
+
+Outputs:
+  CounterApiUrl:
+    Description: API Gateway endpoint URL for the counter resource.
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/counter"
+  CounterTableName:
+    Description: DynamoDB table for persistent visitor count.
+    Value: !Ref VisitorCounterTable
