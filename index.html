@@ -39,7 +39,7 @@
             <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <i class="fab fa-linkedin-in"></i>
             </a>
-            <a href="javascript:void(0);" onclick="copyEmail()" id="email-icon" title="copy the email address">
+            <a href="javascript:void(0);" onclick="copyEmail(this)" class="copy-email-trigger" title="copy the email address">
                 <i class="fas fa-envelope"></i> </a>
             <input type="text" value="diawpijun@gmail.com" id="myEmail" style="display:none;">
         </div>
@@ -52,12 +52,6 @@
         <span id="counter" class="counter-number">0</span>
         <img id="loading-icon" src="images/Cat-Running-Sticker.gif" alt="cat">
     </p>
-</div>
-
-<div class="contact-item">
-    <a href="javascript:void(0)" onclick="copyEmail()" id="email-container">
-        <i class="fas fa-envelope" id="email-icon" title="Copy Email"></i>
-        </a>
 </div>
         
     </aside>

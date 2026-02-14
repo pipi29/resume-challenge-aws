@@ -130,21 +130,41 @@ navItems.forEach(item => {
         });
 
 
-//copyemail
-function copyEmail() {
-    const email = "diawpijun@gmail.com";
-    const container = document.getElementById('email-container');
-    
-    // 兼容性复制逻辑
-    const handleCopy = () => {
-        const badge = document.createElement('div');
-        badge.className = 'copy-badge';
-        badge.innerText = 'Copied ✨';
-        container.appendChild(badge);
-        
-        // 2秒后自动销毁，保持页面干净
-        setTimeout(() => badge.remove(), 2000);
+// copy email
+let activeCopyBadge = null;
+
+function showCopyBadge(target) {
+    if (!target) return;
+
+    if (activeCopyBadge) {
+        activeCopyBadge.remove();
+        activeCopyBadge = null;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'copy-badge';
+    badge.textContent = 'Copied';
+    target.appendChild(badge);
+    activeCopyBadge = badge;
+
+    const cleanup = () => {
+        if (!badge.isConnected) return;
+        badge.remove();
+        if (activeCopyBadge === badge) {
+            activeCopyBadge = null;
+        }
     };
+
+    badge.addEventListener('animationend', cleanup, { once: true });
+    setTimeout(cleanup, 1700);
+}
+
+function copyEmail(triggerElement) {
+    const email = "diawpijun@gmail.com";
+    const target = triggerElement instanceof Element
+        ? triggerElement
+        : document.getElementById('email-container');
+    const handleCopy = () => showCopyBadge(target);
 
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(email).then(handleCopy);

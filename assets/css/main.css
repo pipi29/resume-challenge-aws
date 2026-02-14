@@ -226,6 +226,10 @@ section {
 }
 
 /* views Counter */
+.views-counter {
+    margin-top: 1.25rem;
+}
+
 .counter-wrapper {
     display: flex;         
     align-items: center;  
@@ -246,27 +250,32 @@ section {
     color: #007bff;       
 }
 
-/*email-container*/
-#email-container {
-    position: relative; 
+/* Email copy tooltip */
+.copy-email-trigger {
+    position: relative;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
 }
 
 .copy-badge {
-    position: absolute; 
-    top: -35px;        
+    position: absolute;
     left: 50%;
-    transform: translateX(-50%);
-    background: #333;  
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px; 
-    font-size: 12px;
+    bottom: calc(100% + 12px);
+    transform: translate(-50%, 8px);
+    background: #191919;
+    color: #f7f7f7;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    animation: fadeInOut 2s forwards; 
-    z-index: 10;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 30;
+    animation: copyBadgeReveal 1.4s ease forwards;
 }
 
 .copy-badge::after {
@@ -274,17 +283,26 @@ section {
     position: absolute;
     top: 100%;
     left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #333 transparent transparent transparent;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #191919;
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translate(-50%, 5px); }
-    15% { opacity: 1; transform: translate(-50%, 0); }
-    85% { opacity: 1; transform: translate(-50%, 0); }
-    100% { opacity: 0; transform: translate(-50%, -5px); }
+@keyframes copyBadgeReveal {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 8px);
+    }
+    15%,
+    75% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -6px);
+    }
 }
 
 /* === PROFILE SECTION === */
