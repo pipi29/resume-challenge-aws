@@ -246,6 +246,47 @@ section {
     color: #007bff;       
 }
 
+/*email-container*/
+#email-container {
+    position: relative; 
+    display: inline-flex;
+    align-items: center;
+}
+
+.copy-badge {
+    position: absolute; 
+    top: -35px;        
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;  
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px; 
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    animation: fadeInOut 2s forwards; 
+    z-index: 10;
+}
+
+.copy-badge::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, 5px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -5px); }
+}
+
 /* === PROFILE SECTION === */
 #profile {
     padding-top: 0 !important;

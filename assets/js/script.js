@@ -19,8 +19,30 @@
 const API_URL = "https://m6axvj0b4e.execute-api.ap-northeast-1.amazonaws.com/prod/visits";
 const counterEl = document.getElementById('counter');
 const catIcon = document.getElementById('loading-icon');
+const LOCAL_COUNTER_KEY = "local_page_views";
+
+function isHttpsEnvironment() {
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    return window.location.protocol === "https:" || isLocalhost;
+}
+
+function getLocalCounter() {
+    const current = parseInt(localStorage.getItem(LOCAL_COUNTER_KEY) || "0", 10);
+    const next = Number.isNaN(current) ? 1 : current + 1;
+    localStorage.setItem(LOCAL_COUNTER_KEY, String(next));
+    return next;
+}
 
 async function getCounter() {
+    if (!counterEl) return;
+
+    if (!isHttpsEnvironment()) {
+        const localCount = getLocalCounter();
+        animateCounter(counterEl, localCount);
+        if (catIcon) catIcon.src = "images/gotit!.gif";
+        return;
+    }
+
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error();
@@ -37,6 +59,11 @@ async function getCounter() {
 }
 
 function animateCounter(el, target) {
+    if (!el || !Number.isFinite(target) || target < 0) {
+        if (el) el.innerText = "0";
+        return;
+    }
+
     let current = 0;
     const step = Math.ceil(target / 50);
     const timer = setInterval(() => {
@@ -106,43 +133,28 @@ navItems.forEach(item => {
 //copyemail
 function copyEmail() {
     const email = "diawpijun@gmail.com";
-    const icon = document.getElementById('email-icon');
+    const container = document.getElementById('email-container');
     
-    // Fallback: Use older method if clipboard API is blocked by non-HTTPS
-    if (!navigator.clipboard) {
+    // 兼容性复制逻辑
+    const handleCopy = () => {
+        const badge = document.createElement('div');
+        badge.className = 'copy-badge';
+        badge.innerText = 'Copied ✨';
+        container.appendChild(badge);
+        
+        // 2秒后自动销毁，保持页面干净
+        setTimeout(() => badge.remove(), 2000);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(email).then(handleCopy);
+    } else {
         const textArea = document.createElement("textarea");
         textArea.value = email;
         document.body.appendChild(textArea);
         textArea.select();
-        try {
-            document.execCommand('copy');
-            handleCopyFeedback(icon);
-        } catch (err) {
-            console.error('Fallback failed', err);
-        }
+        document.execCommand('copy');
         document.body.removeChild(textArea);
-        return;
+        handleCopy();
     }
-
-    // Modern API
-    navigator.clipboard.writeText(email)
-        .then(() => handleCopyFeedback(icon))
-        .catch(err => console.error('Copy failed', err));
-}
-
-function handleCopyFeedback(icon) {
-    const originalTitle = icon.title;
-    icon.title = "Copied!";
-    
-    // Better UX: Show a small text or change icon color temporarily
-    const feedback = document.createElement('span');
-    feedback.innerText = " ✨ Copied!";
-    feedback.style.fontSize = "0.8rem";
-    feedback.style.color = "#28a745";
-    icon.parentNode.appendChild(feedback);
-    
-    setTimeout(() => { 
-        icon.title = originalTitle; 
-        feedback.remove();
-    }, 2000);
 }
