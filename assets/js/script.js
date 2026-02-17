@@ -15,55 +15,11 @@
         });
 
 
-//visitor-counter-animation
 const API_URL = "https://m6axvj0b4e.execute-api.ap-northeast-1.amazonaws.com/prod/visits";
-const counterEl = document.getElementById('counter');
+const counterEl = document.getElementById('views');
 const catIcon = document.getElementById('loading-icon');
-const LOCAL_COUNTER_KEY = "local_page_views";
 
-function isHttpsEnvironment() {
-    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-    return window.location.protocol === "https:" || isLocalhost;
-}
-
-function getLocalCounter() {
-    const current = parseInt(localStorage.getItem(LOCAL_COUNTER_KEY) || "0", 10);
-    const next = Number.isNaN(current) ? 1 : current + 1;
-    localStorage.setItem(LOCAL_COUNTER_KEY, String(next));
-    return next;
-}
-
-async function getCounter() {
-    if (!counterEl) return;
-
-    if (!isHttpsEnvironment()) {
-        const localCount = getLocalCounter();
-        animateCounter(counterEl, localCount);
-        if (catIcon) catIcon.src = "images/gotit!.gif";
-        return;
-    }
-
-    try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error();
-        const data = await response.json();
-        
-        const target = parseInt(data.views);
-        animateCounter(counterEl, target);
-        
-        if (catIcon) catIcon.src = "images/gotit!.gif";
-    } catch (error) {
-        if (counterEl) counterEl.innerText = "Error";
-        if (catIcon) catIcon.src = "images/error.gif";
-    }
-}
-
-function animateCounter(el, target) {
-    if (!el || !Number.isFinite(target) || target < 0) {
-        if (el) el.innerText = "0";
-        return;
-    }
-
+const animate = (el, target) => {
     let current = 0;
     const step = Math.ceil(target / 50);
     const timer = setInterval(() => {
@@ -75,10 +31,23 @@ function animateCounter(el, target) {
             el.innerText = current.toLocaleString();
         }
     }, 20);
-}
+};
+
+const getCounter = async () => {
+    if (!counterEl) return;
+    try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error();
+        const { views } = await res.json();
+        animate(counterEl, parseInt(views));
+        if (catIcon) catIcon.src = "images/gotit!.gif";
+    } catch (e) {
+        counterEl.innerText = "Error";
+        if (catIcon) catIcon.src = "images/error.gif";
+    }
+};
 
 getCounter();
-
 // Fun facts rotation
         const funFacts = [
             "AWS has over 200 services! 🚀",
